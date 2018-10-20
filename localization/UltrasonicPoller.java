@@ -31,7 +31,7 @@ public class UltrasonicPoller extends Thread {
 			if (distance > 200) distance = 200; // if distance is too large, it is set to 200
 			if (distance < 5) distance = 5; // if distance is too small, it is set to 5
 			try {
-				Thread.sleep(10);
+				Thread.sleep(15);
 			} catch (Exception e) {
 			}
 		}

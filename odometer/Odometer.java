@@ -26,7 +26,7 @@ public class Odometer extends OdometerData implements Runnable {
 
 
 
-  private static final long ODOMETER_PERIOD = 10; // odometer update period in ms
+  private static final long ODOMETER_PERIOD = 15; // odometer update period in ms
 
   /**
    * This is the default constructor of this class. It initiates all motors and variables once.It
