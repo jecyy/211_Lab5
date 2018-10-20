@@ -5,9 +5,9 @@ import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 /**
- * This class is an alternative localization method
- * which only uses ultrasonic sensor and is based on Law of cosines
- * @author jealo
+ * This is an alternative approach to do localization,
+ * using only an ultrasonic sensor and based on Law of cosines
+ * @author jecyy
  *
  */
 

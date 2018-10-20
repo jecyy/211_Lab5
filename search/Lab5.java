@@ -13,8 +13,8 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 
 /**
- * This is the main class that runs the whole Localization program.
- * @author jealo
+ * This is the main class that runs the program
+ * @author jecyy
  *
  */
 public class Lab5 {
@@ -98,7 +98,12 @@ public class Lab5 {
 				}
 			}).start();
 
-			//TODO: add search procedure
+			while (LightLocalizer.finished == false); // check if Light Localizer is finished
+			(new Thread() {	   // spawn a new Thread to avoid Search.run() from blocking
+				public void run() {
+					Search.run(leftMotor, rightMotor, WHEEL_RAD, WHEEL_RAD, TRACK, odometer);
+				}
+			}).start();
 		}
 
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);

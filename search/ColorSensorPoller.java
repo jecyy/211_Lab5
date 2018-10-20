@@ -2,6 +2,11 @@ package ca.mcgill.ecse211.search;
 
 import lejos.robotics.SampleProvider;
 
+/**
+ * This class runs the color sensor and provides the readings
+ * @author jecyy
+ *
+ */
 public class ColorSensorPoller extends Thread {
 	private static float R, G, B;
 	private SampleProvider myColorSample;

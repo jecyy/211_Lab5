@@ -5,8 +5,8 @@ import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 /**
- * This class runs the Ultrasonic Localizer.
- * @author jealo
+ * This class implements the ultrasonic localization
+ * @author jecyy
  *
  */
 public class UltrasonicLocalizer {

@@ -2,6 +2,11 @@ package ca.mcgill.ecse211.localization;
 
 import lejos.robotics.SampleProvider;
 
+/**
+ * This class provides the light sensor readings
+ * @author jecyy
+ *
+ */
 public class LightSensorPoller extends Thread {
 	private static float light = 0;
 	private SampleProvider myLightSample;

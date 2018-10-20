@@ -5,8 +5,8 @@ import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 /**
- * This class implements the Light Localization.
- * @author jealo
+ * This class implements the light localization
+ * @author jecyy
  *
  */
 public class LightLocalizer {

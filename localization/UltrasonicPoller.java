@@ -5,7 +5,8 @@ import lejos.robotics.SampleProvider;
 
 /**
  * This class runs the ultrasonic sensor using a thread
- * @author jealo
+ * and provides the readings
+ * @author jecyy
  *
  */
 public class UltrasonicPoller extends Thread {

@@ -1,15 +1,21 @@
 package ca.mcgill.ecse211.search;
 
+import ca.mcgill.ecse211.localization.UltrasonicPoller;
 import ca.mcgill.ecse211.odometer.Odometer;
 import ca.mcgill.ecse211.odometer.OdometerExceptions;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ * This class lets the robot travel to search area and do searching
+ * @author jecyy
+ *
+ */
 public class Search {
 	private static int LLX = 3, LLY = 3, 
 			           URX = 7, URY = 7; // coordinates of the Lower-Left and Upper-Right hand corner of the search region
 	private static int TR = 1; // the number defining the color of the target ring
-	private static int SC = 0; // the starting corner
+	private static final int SC = 0; // the starting corner
 	private static double Rmin, Rmax,
 	                      Gmin, Gmax,
 	                      Bmin, Bmax; // range for detection
@@ -20,15 +26,16 @@ public class Search {
 	private static double toTravel, currentT, theta;
 	private static double pi = Math.PI;
 	private static int FORWARD_SPEED = 150, ROTATE_SPEED = 50;
+	private static boolean found = false; // indicates if target ring is found
 	private static final double ts = 30.48; // TILE SIZE
-	
+
 
 	public static void run(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor,
 			double leftRadius, double rightRadius, double track, Odometer odometer) {
 
 		left = leftMotor;
 		right = rightMotor;
-	    odo = odometer;
+		odo = odometer;
 		leftR = leftRadius;
 		rightR = rightRadius;
 		trac = track;
@@ -50,36 +57,95 @@ public class Search {
 		} catch (InterruptedException e) {
 			// There is nothing to be done here
 		}
-        
+
+		// set the color range
+		if (TR == 0) { // blue
+
+		}
+		else if (TR == 1) { // green
+
+		}
+		else if (TR == 2) { // yellow
+
+		}
+		else { // orange
+
+		}
+
+
 		travelTo(LLX, LLY); // travel to the lower left corner
 		Sound.beep();       // and BEEP
-		travelTo(LLX + 0.5, LLY + 0.5); // travel half of a tile, and ensure that the robot is heading positive X-axis
-        searchLine();
-        
-        
 
-		leftMotor.stop();
-		rightMotor.stop();
+		for (int i = 1; i <= 3; i++) {
+			travelTo(LLX + i, LLY); // travel a tile, and ensure that the robot is heading positive X-axis
+			searchLine();
+			travelTo(LLX + i, LLY); // go back
+			if (found == true) break;
+		}
+
+		travelTo(URX, LLY);
+		travelTo(URX, URY);
+
+		if (found == false) {
+			for (int i = 1; i <= 3; i++) {
+				travelTo(URX - i, URY);
+				searchLine();
+				travelTo(URX - i, URY);
+				if (found == true) break;
+			}
+			travelTo(URX, URY);
+		}
+
+		left.setSpeed(0);
+		right.setSpeed(0);
+
+
 	}
-	
+
+
 	private static int findMatch() {
-		return 0;
+		double  r = ColorSensorPoller.getR(),
+				g = ColorSensorPoller.getG(),
+				b = ColorSensorPoller.getB();
+
+		if (r > b) { // blue or green
+			if (g > 2 * b) return 1;
+			else return 0;
+		}
+		else { // red or orange
+			if (r > 1.7 * g) return 3;
+			else return 2;
+		}
 	}
-	
+
 	private static void searchLine() {
-        turn(-90); // turn to positive Y-axis
-        left.setSpeed(FORWARD_SPEED);
-        right.setSpeed(FORWARD_SPEED);
-        left.forward();
-        right.forward();
-        
-        while(true) {
-        	
-        }
-	}
-	
-	private static int seeRing() {
-		return 0;
+		turn(-90); // turn to positive Y-axis
+		left.setSpeed(FORWARD_SPEED);
+		right.setSpeed(FORWARD_SPEED);
+		left.forward();
+		right.forward();
+
+		while(UltrasonicPoller.get_distance() > 5.0 &&
+				odo.getXYT()[1] < URY && odo.getXYT()[1] > LLY);
+
+		left.setSpeed(0);
+		right.setSpeed(0);
+
+		if (UltrasonicPoller.get_distance() <= 5.0) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+			}
+
+			if (findMatch() == SC) {
+				Sound.beep();
+				found = true;
+			}
+			else {
+				Sound.beep();
+				Sound.beep();
+			}
+		}
 	}
 
 	private static void travelTo(double x, double y) {

@@ -3,8 +3,8 @@ package ca.mcgill.ecse211.odometer;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 /**
- * This class records the robot's current position.
- * @author jealo
+ * This class runs the odometer, recording the current position of the robot 
+ * @author jecyy
  *
  */
 public class Odometer extends OdometerData implements Runnable {
