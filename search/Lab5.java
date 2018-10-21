@@ -64,15 +64,16 @@ public class Lab5 {
 			lcd.clear();
 
 			// wait to start
-			lcd.drawString("< press R to start >", 0, 0);
+			lcd.drawString("<   L   |   R   >", 0, 0);
+			lcd.drawString("< color | field >", 0, 1);
 
 			buttonChoice = Button.waitForAnyPress(); // press right button to start
-		} while (buttonChoice != Button.ID_RIGHT);
+		} while (buttonChoice != Button.ID_RIGHT && buttonChoice != Button.ID_LEFT);
 
 		if (buttonChoice == Button.ID_RIGHT) {
 
-			display.run();
-			
+			lcd.clear();
+
 			// Start odometer
 			Thread odoThread = new Thread(odometer);
 			odoThread.start();
@@ -98,20 +99,31 @@ public class Lab5 {
 					LightLocalizer.run(leftMotor, rightMotor, WHEEL_RAD, WHEEL_RAD, TRACK, odometer);
 				}
 			}).start();
-			
+
 			// Stop LightSensorPoller
 			lightThread.interrupt();
 
 			// Start ColorSensorPoller
 			Thread colorThread = new Thread(color);
 			colorThread.start();
-			
+
 			while (LightLocalizer.finished == false); // check if Light Localizer is finished
 			(new Thread() {	   // spawn a new Thread to avoid Search.run() from blocking
 				public void run() {
 					Search.run(leftMotor, rightMotor, WHEEL_RAD, WHEEL_RAD, TRACK, odometer);
 				}
 			}).start();
+		}
+		else if (buttonChoice == Button.ID_LEFT) {
+			// Start UltrasonicPoller
+			Thread UltrasonicThread = new Thread(ultrasonic);
+			UltrasonicThread.start();
+
+			// Start ColorSensorPoller
+			Thread colorThread = new Thread(color);
+			colorThread.start();
+			Thread displayThread = new Thread(display);
+			displayThread.start();
 		}
 
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);

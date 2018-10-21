@@ -30,7 +30,7 @@ public class UltrasonicPoller extends Thread {
 			us.fetchSample(usData, 0); // acquire data
 			distance = (int) (usData[0] * 100.0); // extract from buffer, cast to int
 			if (distance > 200) distance = 200; // if distance is too large, it is set to 200
-			if (distance < 5) distance = 5; // if distance is too small, it is set to 5
+			if (distance < 4) distance = 4; // if distance is too small, it is set to 4
 			try {
 				Thread.sleep(15);
 			} catch (Exception e) {

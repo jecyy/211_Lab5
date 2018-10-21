@@ -14,7 +14,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 public class Search {
 	private static int LLX = 3, LLY = 3, 
 			           URX = 7, URY = 7; // coordinates of the Lower-Left and Upper-Right hand corner of the search region
-	private static int TR = 1; // the number defining the color of the target ring
+	private static int TR = 0; // the number defining the color of the target ring
 	private static final int SC = 0; // the starting corner
 	private static double Rmin, Rmax,
 	                      Gmin, Gmax,
@@ -85,7 +85,7 @@ public class Search {
 		odo.setY(3 * ts);
 		odo.setTheta(45);
 
-		for (int i = 1; i <= 3; i++) {
+		for (int i = 1; i <= URX - LLX - 1; i++) {
 			travelTo(LLX + i, LLY); // travel a tile, and ensure that the robot is heading positive X-axis
 			searchLine();
 			Sound.beepSequenceUp();
@@ -101,7 +101,7 @@ public class Search {
 		travelTo(URX, URY);
 
 		if (found == false) {
-			for (int i = 1; i <= 3; i++) {
+			for (int i = 1; i <= URX - LLX - 1; i++) {
 				travelTo(URX - i, URY);
 				searchLine();
 				Sound.beepSequenceUp();
@@ -122,18 +122,18 @@ public class Search {
 	}
 
 
-	private static int findMatch() {
+	public static int findMatch() {
 		double  r = ColorSensorPoller.getR(),
 				g = ColorSensorPoller.getG(),
 				b = ColorSensorPoller.getB();
 
-		if (r > b) { // blue or green
-			if (g > 2 * b) return 1;
-			else return 0;
+		if (r < b) { // blue
+			return 0; // blue
 		}
-		else { // red or orange
-			if (r > 1.7 * g) return 3;
-			else return 2;
+		else { // red, orange or green
+			if (g > 2 * b) return 1; // green
+			else if (r > 1.7 * g) return 3; // orange
+			else return 2; // yellow
 		}
 	}
 
@@ -142,7 +142,7 @@ public class Search {
 		left.setSpeed(FORWARD_SPEED);
 		right.setSpeed(FORWARD_SPEED);
 
-		while(UltrasonicPoller.get_distance() > 6.0 &&
+		while(UltrasonicPoller.get_distance() > 4.5 &&
 				odo.getXYT()[1] <= URY * ts + 5 && odo.getXYT()[1] >= LLY * ts - 5) {
 			left.forward();
 			right.forward();
