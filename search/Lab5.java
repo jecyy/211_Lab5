@@ -27,7 +27,7 @@ public class Lab5 {
 	private static final TextLCD lcd = LocalEV3.get().getTextLCD();
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port portLight = LocalEV3.get().getPort("S2");
-	//private static final Port portColor = LocalEV3.get().getPort("S3");
+	private static final Port portColor = LocalEV3.get().getPort("S3");
 	public static final double WHEEL_RAD = 2.2;
 	public static final double TRACK = 13.1;
 
@@ -50,13 +50,13 @@ public class Lab5 {
 		float[] sampleLight = new float[myLight.sampleSize()];
 		// Color sensor
 		@SuppressWarnings("resource")
-		//SensorModes myColor = new EV3ColorSensor(portColor);
-		//SampleProvider myColorSample = myColor.getMode("RGB");
+		SensorModes myColor = new EV3ColorSensor(portColor);
+		SampleProvider myColorSample = myColor.getMode("RGB");
 		float[] sampleColor = new float[3];
 		// returned
 		UltrasonicPoller ultrasonic = new UltrasonicPoller(usDistance, usData);
 		LightSensorPoller light = new LightSensorPoller(myLightSample, sampleLight);
-		//ColorSensorPoller color = new ColorSensorPoller(myColorSample, sampleColor);
+		ColorSensorPoller color = new ColorSensorPoller(myColorSample, sampleColor);
 
 
 		do {
@@ -70,11 +70,12 @@ public class Lab5 {
 		} while (buttonChoice != Button.ID_RIGHT);
 
 		if (buttonChoice == Button.ID_RIGHT) {
+
+			display.run();
+			
 			// Start odometer
 			Thread odoThread = new Thread(odometer);
 			odoThread.start();
-
-			display.run();
 
 			// Start UltrasonicPoller
 			Thread UltrasonicThread = new Thread(ultrasonic);
@@ -97,7 +98,14 @@ public class Lab5 {
 					LightLocalizer.run(leftMotor, rightMotor, WHEEL_RAD, WHEEL_RAD, TRACK, odometer);
 				}
 			}).start();
+			
+			// Stop LightSensorPoller
+			lightThread.interrupt();
 
+			// Start ColorSensorPoller
+			Thread colorThread = new Thread(color);
+			colorThread.start();
+			
 			while (LightLocalizer.finished == false); // check if Light Localizer is finished
 			(new Thread() {	   // spawn a new Thread to avoid Search.run() from blocking
 				public void run() {

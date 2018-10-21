@@ -24,7 +24,7 @@ public class ColorSensorPoller extends Thread {
 			G = sampleColor[1] * 1000;
 			B = sampleColor[2] * 1000;
 			try {
-				Thread.sleep(10);
+				Thread.sleep(15);
 			} catch (Exception e) {
 			}
 		}

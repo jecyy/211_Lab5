@@ -19,7 +19,7 @@ public class LightLocalizer {
 	private static double leftRadius, rightRadius, track;
 	private static double y1, y2, x1, x2; // angle at positive y-axis, negative y-axis, positive x-axis, negative x-axis
 	private static final double d = 12.8; // distance between the light sensor and the center of rotation
-	private static final double extraDis = 5.0; // extra distance traveled before entering Light Localizer
+	private static final double extraDis = 6.0; // extra distance traveled before entering Light Localizer
 	public static boolean finished = false;
 	
 	/**
@@ -91,7 +91,7 @@ public class LightLocalizer {
 		while(true) {
 			color = LightSensorPoller.get_light();
 			
-			if (color < 450 && odo.getXYT()[2] > 180) {
+			if (color < 450 && odo.getXYT()[2] > 200) {
 				Sound.beep();
 				x1 = odo.getXYT()[2];
 				leftMotor.setSpeed(0);

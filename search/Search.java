@@ -25,7 +25,7 @@ public class Search {
 	private static double deltaX, deltaY;
 	private static double toTravel, currentT, theta;
 	private static double pi = Math.PI;
-	private static int FORWARD_SPEED = 150, ROTATE_SPEED = 50;
+	private static int FORWARD_SPEED = 175, ROTATE_SPEED = 100;
 	private static boolean found = false; // indicates if target ring is found
 	private static final double ts = 30.48; // TILE SIZE
 
@@ -42,7 +42,7 @@ public class Search {
 		// reset the motors
 		for (EV3LargeRegulatedMotor motor : new EV3LargeRegulatedMotor[] {leftMotor, rightMotor}) {
 			motor.stop();
-			motor.setAcceleration(300);
+			motor.setAcceleration(6000);
 		}
 
 		// prepare odometer
@@ -57,6 +57,11 @@ public class Search {
 		} catch (InterruptedException e) {
 			// There is nothing to be done here
 		}
+		
+		// adjust odometer
+		odo.setX(ts);
+		odo.setY(ts);
+		odo.setTheta(0);
 
 		// set the color range
 		if (TR == 0) { // blue
@@ -75,11 +80,20 @@ public class Search {
 
 		travelTo(LLX, LLY); // travel to the lower left corner
 		Sound.beep();       // and BEEP
+		// adjust the odometer
+		odo.setX(3 * ts);
+		odo.setY(3 * ts);
+		odo.setTheta(45);
 
 		for (int i = 1; i <= 3; i++) {
 			travelTo(LLX + i, LLY); // travel a tile, and ensure that the robot is heading positive X-axis
 			searchLine();
+			Sound.beepSequenceUp();
 			travelTo(LLX + i, LLY); // go back
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+			}
 			if (found == true) break;
 		}
 
@@ -90,7 +104,12 @@ public class Search {
 			for (int i = 1; i <= 3; i++) {
 				travelTo(URX - i, URY);
 				searchLine();
+				Sound.beepSequenceUp();
 				travelTo(URX - i, URY);
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+				}
 				if (found == true) break;
 			}
 			travelTo(URX, URY);
@@ -122,33 +141,33 @@ public class Search {
 		turn(-90); // turn to positive Y-axis
 		left.setSpeed(FORWARD_SPEED);
 		right.setSpeed(FORWARD_SPEED);
-		left.forward();
-		right.forward();
 
-		while(UltrasonicPoller.get_distance() > 5.0 &&
-				odo.getXYT()[1] < URY && odo.getXYT()[1] > LLY);
+		while(UltrasonicPoller.get_distance() > 6.0 &&
+				odo.getXYT()[1] <= URY * ts + 5 && odo.getXYT()[1] >= LLY * ts - 5) {
+			left.forward();
+			right.forward();
+			try {
+				Thread.sleep(25);
+			} catch (InterruptedException e) {
+			}
+		};
 
 		left.setSpeed(0);
 		right.setSpeed(0);
 
-		if (UltrasonicPoller.get_distance() <= 5.0) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-			}
+		if (UltrasonicPoller.get_distance() <= 6.0) {
 
 			if (findMatch() == SC) {
 				Sound.beep();
 				found = true;
 			}
 			else {
-				Sound.beep();
-				Sound.beep();
+				Sound.twoBeeps();
 			}
 		}
 	}
 
-	private static void travelTo(double x, double y) {
+	private static void travelTo(int x, int y) {
 		deltaX = x * ts - odo.getXYT()[0];
 		deltaY = y * ts - odo.getXYT()[1];
 		toTravel = Math.sqrt(deltaX * deltaX + deltaY * deltaY); // calculate the distance between the current and next way point
@@ -208,11 +227,11 @@ public class Search {
 	 * @return
 	 */
 	private static int convertDistance(double radius, double distance) {
-		return (int) ((180.0 * distance) / (Math.PI * radius));
+		return (int) ((180.0 * distance) / (pi * radius));
 	}
 
 	private static int convertAngle(double radius, double width, double angle) {
-		return convertDistance(radius, Math.PI * width * angle / 360.0);
+		return convertDistance(radius, pi * width * angle / 360.0);
 	}
 
 	private static double[] normalize(double R, double G, double B) {
