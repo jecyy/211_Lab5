@@ -22,7 +22,7 @@ public class LightSensorPoller extends Thread {
 			myLightSample.fetchSample(sampleLight, 0); // activate the light sensor
 			light = sampleLight[0] * 1000; // get the light sensor reading
 			try {
-				Thread.sleep(10);
+				Thread.sleep(50);
 			} catch (Exception e) {
 			}
 		}

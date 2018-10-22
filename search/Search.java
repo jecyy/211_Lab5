@@ -42,7 +42,7 @@ public class Search {
 		// reset the motors
 		for (EV3LargeRegulatedMotor motor : new EV3LargeRegulatedMotor[] {leftMotor, rightMotor}) {
 			motor.stop();
-			motor.setAcceleration(6000);
+			motor.setAcceleration(1000);
 		}
 
 		// prepare odometer
@@ -88,8 +88,10 @@ public class Search {
 		for (int i = 1; i <= URX - LLX - 1; i++) {
 			travelTo(LLX + i, LLY); // travel a tile, and ensure that the robot is heading positive X-axis
 			searchLine();
-			Sound.beepSequenceUp();
+			left.rotate(-720, true);
+			right.rotate(-720, false);
 			travelTo(LLX + i, LLY); // go back
+			Sound.beepSequenceUp();
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
@@ -104,8 +106,10 @@ public class Search {
 			for (int i = 1; i <= URX - LLX - 1; i++) {
 				travelTo(URX - i, URY);
 				searchLine();
-				Sound.beepSequenceUp();
+				left.rotate(-720, true);
+				right.rotate(-720, false);
 				travelTo(URX - i, URY);
+				Sound.beepSequenceUp();
 				try {
 					Thread.sleep(50);
 				} catch (InterruptedException e) {
@@ -127,27 +131,31 @@ public class Search {
 				g = ColorSensorPoller.getG(),
 				b = ColorSensorPoller.getB();
 
-		if (r < b) { // blue
-			return 0; // blue
-		}
-		else { // red, orange or green
-			if (g > 2 * b) return 1; // green
-			else if (r > 1.7 * g) return 3; // orange
-			else return 2; // yellow
-		}
+		if (r < b) // blue
+			return 0;
+		else if (r < g) // green
+			return 1; 
+		else if (r > 2 * g) return 3; // orange
+		else return 2; // yellow
+		
 	}
 
 	private static void searchLine() {
 		turn(-90); // turn to positive Y-axis
 		left.setSpeed(FORWARD_SPEED);
 		right.setSpeed(FORWARD_SPEED);
+		int filterCount = 0;
 
-		while(UltrasonicPoller.get_distance() > 4.5 &&
-				odo.getXYT()[1] <= URY * ts + 5 && odo.getXYT()[1] >= LLY * ts - 5) {
+		while(
+				(odo.getXYT()[1] <= (URY + 0.5) * ts) && (odo.getXYT()[1] >= (LLY - 0.5) * ts)
+				) {
 			left.forward();
 			right.forward();
+			if (UltrasonicPoller.get_distance() > 4.5) filterCount = 0;
+			else filterCount ++;
+			if (filterCount >= 3) break;
 			try {
-				Thread.sleep(25);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 			}
 		};
@@ -155,7 +163,7 @@ public class Search {
 		left.setSpeed(0);
 		right.setSpeed(0);
 
-		if (UltrasonicPoller.get_distance() <= 6.0) {
+		if (UltrasonicPoller.get_distance() <= 4.5) {
 
 			if (findMatch() == SC) {
 				Sound.beep();

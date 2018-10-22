@@ -39,12 +39,12 @@ public class UltrasonicLocalizer {
 		
 	    for (EV3LargeRegulatedMotor motor : new EV3LargeRegulatedMotor[] {left, right}) {
 	        motor.stop();
-	        motor.setAcceleration(6000);
+	        motor.setAcceleration(1000);
 	      }
 	    
 	    // Sleep for 2 seconds
 	    try {
-	      Thread.sleep(2000);
+	      Thread.sleep(1000);
 	    } catch (InterruptedException e) {
 	      // There is nothing to be done here
 	    }
