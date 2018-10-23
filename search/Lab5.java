@@ -14,16 +14,15 @@ import lejos.robotics.SampleProvider;
 
 /**
  * This is the main class that runs the program
+ * 
  * @author jecyy
  *
  */
 public class Lab5 {
 
 	// Motor Objects, and Robot related parameters
-	private static final EV3LargeRegulatedMotor leftMotor =
-			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-	private static final EV3LargeRegulatedMotor rightMotor =
-			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
+	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final TextLCD lcd = LocalEV3.get().getTextLCD();
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port portLight = LocalEV3.get().getPort("S2");
@@ -57,7 +56,6 @@ public class Lab5 {
 		UltrasonicPoller ultrasonic = new UltrasonicPoller(usDistance, usData);
 		LightSensorPoller light = new LightSensorPoller(myLightSample, sampleLight);
 		ColorSensorPoller color = new ColorSensorPoller(myColorSample, sampleColor);
-
 
 		do {
 			// clear the display
@@ -93,28 +91,29 @@ public class Lab5 {
 				}
 			}).start();
 
-			while (UltrasonicLocalizer.finished == false);	 // check if Ultrasonic Localizer is finished
-			(new Thread() {	   // spawn a new Thread to avoid LightLocalizer.run() from blocking
+			while (UltrasonicLocalizer.finished == false)
+				; // check if Ultrasonic Localizer is finished
+			(new Thread() { // spawn a new Thread to avoid LightLocalizer.run() from blocking
 				public void run() {
 					LightLocalizer.run(leftMotor, rightMotor, WHEEL_RAD, WHEEL_RAD, TRACK, odometer);
 				}
 			}).start();
 
 			// Stop LightSensorPoller
-			lightThread.interrupt();
+			// lightThread.interrupt();
 
 			// Start ColorSensorPoller
 			Thread colorThread = new Thread(color);
 			colorThread.start();
 
-			while (LightLocalizer.finished == false); // check if Light Localizer is finished
-			(new Thread() {	   // spawn a new Thread to avoid Search.run() from blocking
+			while (LightLocalizer.finished == false)
+				; // check if Light Localizer is finished
+			(new Thread() { // spawn a new Thread to avoid Search.run() from blocking
 				public void run() {
 					Search.run(leftMotor, rightMotor, WHEEL_RAD, WHEEL_RAD, TRACK, odometer);
 				}
 			}).start();
-		}
-		else if (buttonChoice == Button.ID_LEFT) {
+		} else if (buttonChoice == Button.ID_LEFT) {
 			// Start UltrasonicPoller
 			Thread UltrasonicThread = new Thread(ultrasonic);
 			UltrasonicThread.start();
@@ -126,7 +125,8 @@ public class Lab5 {
 			displayThread.start();
 		}
 
-		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
+		while (Button.waitForAnyPress() != Button.ID_ESCAPE)
+			;
 		System.exit(0);
 	}
 }
